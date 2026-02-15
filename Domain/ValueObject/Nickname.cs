@@ -1,0 +1,60 @@
+using Domain.Exception;
+using System.Text.RegularExpressions;
+
+namespace Domain.ValueObject;
+
+public readonly struct Nickname : IEquatable<Nickname>
+{
+    private readonly string _name;
+
+    private static readonly Regex Pattern = new(
+        "^[a-z][a-z0-9_]*$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+    private const int MinLength = 4;
+    private const int MaxLength = 32;
+
+    public Nickname(string name)
+    {
+        name = name.Trim();
+
+        if (name.Length < MinLength)
+        {
+            throw new InvalidNicknameException($"Nickname must contain at least {MinLength} symbol(s)");
+        }
+        if (name.Length > MaxLength)
+        {
+            throw new InvalidNicknameException($"Nickname must not contain more than {MaxLength} symbol(s)");
+        }
+        if (!Pattern.IsMatch(name))
+        {
+            throw new InvalidNicknameException("Nickname must start with a latin letter and contain only latin letters, digits and underscore symbols");
+        }
+
+        _name = name;
+    }
+
+    public static implicit operator string(Nickname a)
+        => a._name;
+
+    public static implicit operator Nickname(string a)
+        => new(a);
+
+    public static bool operator ==(Nickname a, Nickname b)
+        => a._name == b._name;
+
+    public static bool operator !=(Nickname a, Nickname b)
+        => a._name != b._name;
+
+    public bool Equals(Nickname other)
+        => _name.Equals(other._name);
+
+    public override bool Equals(object? o)
+        => o is not null && o.GetType() == GetType() && _name.Equals(((Nickname)o)._name);
+
+    public override int GetHashCode()
+        => _name.GetHashCode();
+
+    public override string ToString()
+        => _name;
+}
