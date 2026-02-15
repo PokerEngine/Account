@@ -60,7 +60,7 @@ public class GetAccountDetailTest
         DateOnly birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,

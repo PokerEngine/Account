@@ -1,6 +1,8 @@
 using Application.Repository;
+using Application.Storage;
 using Application.UnitOfWork;
 using Domain.Entity;
+using Domain.Exception;
 
 namespace Application.Command;
 
@@ -20,11 +22,25 @@ public record RegisterAccountResponse : ICommandResponse
 
 public class RegisterAccountHandler(
     IRepository repository,
+    IStorage storage,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<RegisterAccountCommand, RegisterAccountResponse>
 {
     public async Task<RegisterAccountResponse> HandleAsync(RegisterAccountCommand command)
     {
+        // We throw domain exceptions at the application layer to improve performance
+        // because passing a full list of accounts to the domain layer is an overkill
+
+        if (await storage.NicknameExistsAsync(command.Nickname))
+        {
+            throw new NotUniqueNicknameException("An account with such nickname already exists");
+        }
+
+        if (await storage.EmailExistsAsync(command.Email))
+        {
+            throw new NotUniqueEmailException("An account with such email already exists");
+        }
+
         var account = Account.FromScratch(
             uid: await repository.GetNextUidAsync(),
             nickname: command.Nickname,

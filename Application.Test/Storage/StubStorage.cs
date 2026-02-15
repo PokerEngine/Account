@@ -1,14 +1,15 @@
 using Application.Exception;
 using Application.Storage;
 using Domain.Entity;
-using Domain.ValueObject;
 using System.Collections.Concurrent;
 
 namespace Application.Test.Storage;
 
 public class StubStorage : IStorage
 {
-    private readonly ConcurrentDictionary<AccountUid, DetailView> _detailMapping = new();
+    private readonly ConcurrentDictionary<Guid, DetailView> _detailMapping = new();
+    private readonly ConcurrentDictionary<Guid, string> _nicknameUniquenessMapping = new();
+    private readonly ConcurrentDictionary<Guid, string> _emailUniquenessMapping = new();
 
     public Task<DetailView> GetDetailViewAsync(Guid accountUid)
     {
@@ -20,7 +21,40 @@ public class StubStorage : IStorage
         return Task.FromResult(view);
     }
 
+    public Task<bool> NicknameExistsAsync(string nickname)
+    {
+        foreach (var kv in _nicknameUniquenessMapping)
+        {
+            if (kv.Value == nickname)
+            {
+                return Task.FromResult(true);
+            }
+        }
+
+        return Task.FromResult(false);
+    }
+
+    public Task<bool> EmailExistsAsync(string email)
+    {
+        foreach (var kv in _emailUniquenessMapping)
+        {
+            if (kv.Value == email)
+            {
+                return Task.FromResult(true);
+            }
+        }
+
+        return Task.FromResult(false);
+    }
+
     public Task SaveViewAsync(Account account)
+    {
+        SaveDetailView(account);
+        SaveUniquenessView(account);
+        return Task.CompletedTask;
+    }
+
+    private void SaveDetailView(Account account)
     {
         var view = new DetailView
         {
@@ -32,6 +66,11 @@ public class StubStorage : IStorage
             BirthDate = account.BirthDate
         };
         _detailMapping.AddOrUpdate(account.Uid, view, (_, _) => view);
-        return Task.CompletedTask;
+    }
+
+    private void SaveUniquenessView(Account account)
+    {
+        _nicknameUniquenessMapping.AddOrUpdate(account.Uid, account.Nickname, (_, _) => account.Nickname);
+        _emailUniquenessMapping.AddOrUpdate(account.Uid, account.Email, (_, _) => account.Email);
     }
 }

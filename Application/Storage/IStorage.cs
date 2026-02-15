@@ -5,6 +5,8 @@ namespace Application.Storage;
 public interface IStorage
 {
     Task<DetailView> GetDetailViewAsync(Guid accountUid);
+    Task<bool> NicknameExistsAsync(string nickname);
+    Task<bool> EmailExistsAsync(string email);
     Task SaveViewAsync(Account account);
 }
 
