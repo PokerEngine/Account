@@ -15,7 +15,7 @@ public class GetAccountDetailTest
     {
         // Arrange
         var unitOfWork = CreateUnitOfWork();
-        var accountUid = await RegisterAccountAsync(unitOfWork, "Alice", "alice.alright@test.com", "Alice", "Alright", new DateOnly(1990, 1, 1));
+        var accountUid = await RegisterAccountAsync(unitOfWork, "Alice", "alice.alright@test.com", "Alice", "Alright", new DateOnly(2000, 1, 1));
 
         var query = new GetAccountDetailQuery { Uid = accountUid };
         var handler = new GetAccountDetailHandler(unitOfWork.Storage);
@@ -29,7 +29,7 @@ public class GetAccountDetailTest
         Assert.Equal("alice.alright@test.com", response.Email);
         Assert.Equal("Alice", response.FirstName);
         Assert.Equal("Alright", response.LastName);
-        Assert.Equal(new DateOnly(1990, 1, 1), response.BirthDate);
+        Assert.Equal(new DateOnly(2000, 1, 1), response.BirthDate);
     }
 
     [Fact]

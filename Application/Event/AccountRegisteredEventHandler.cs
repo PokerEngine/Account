@@ -3,7 +3,7 @@ using Domain.Event;
 
 namespace Application.Event;
 
-public class TableCreatedEventHandler(
+public class AccountRegisteredEventHandler(
     IIntegrationEventPublisher integrationEventPublisher
 ) : IEventHandler<AccountRegisteredEvent>
 {

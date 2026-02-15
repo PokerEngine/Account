@@ -20,6 +20,11 @@ public readonly struct BirthDate : IEquatable<BirthDate>
         _date = date;
     }
 
+    public static BirthDate FromString(string value)
+    {
+        return new BirthDate(DateOnly.Parse(value));
+    }
+
     private static int GetAge(DateOnly date)
     {
         var today = DateOnly.FromDateTime(DateTime.Today);
@@ -50,5 +55,5 @@ public readonly struct BirthDate : IEquatable<BirthDate>
         => _date.GetHashCode();
 
     public override string ToString()
-        => _date.ToString("yyyy-MM-dd");
+        => _date.ToString();
 }

@@ -16,7 +16,7 @@ public class AccountTest
         var email = new Email("alice.alright@test.com");
         var firstName = new FirstName("Alice");
         var lastName = new LastName("Alright");
-        var birthDate = new BirthDate(new DateOnly(1990, 1, 1));
+        var birthDate = new BirthDate(new DateOnly(2000, 1, 1));
 
         // Act
         var account = Account.FromScratch(
@@ -43,7 +43,7 @@ public class AccountTest
         Assert.Equal(new Email("alice.alright@test.com"), @event.Email);
         Assert.Equal(new FirstName("Alice"), @event.FirstName);
         Assert.Equal(new LastName("Alright"), @event.LastName);
-        Assert.Equal(new BirthDate(new DateOnly(1990, 1, 1)), @event.BirthDate);
+        Assert.Equal(new BirthDate(new DateOnly(2000, 1, 1)), @event.BirthDate);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class AccountTest
         var email = new Email("alice.alright@test.com");
         var firstName = new FirstName("Alice");
         var lastName = new LastName("Alright");
-        var birthDate = new BirthDate(new DateOnly(1990, 1, 1));
+        var birthDate = new BirthDate(new DateOnly(2000, 1, 1));
         var events = new List<IEvent>
         {
             new AccountRegisteredEvent
@@ -97,7 +97,7 @@ public class AccountTest
                 Email =  new Email("alice.alright@test.com"),
                 FirstName = new FirstName("Alice"),
                 LastName = new LastName("Alright"),
-                BirthDate = new BirthDate(new DateOnly(1990, 1, 1)),
+                BirthDate = new BirthDate(new DateOnly(2000, 1, 1)),
                 OccurredAt = new DateTime(2025, 1, 1)
             },
             new AccountRegisteredEvent
@@ -106,7 +106,7 @@ public class AccountTest
                 Email =  new Email("alice.alright@test.com"),
                 FirstName = new FirstName("Alice"),
                 LastName = new LastName("Alright"),
-                BirthDate = new BirthDate(new DateOnly(1990, 1, 1)),
+                BirthDate = new BirthDate(new DateOnly(2000, 1, 1)),
                 OccurredAt = new DateTime(2025, 1, 1)
             }
         };

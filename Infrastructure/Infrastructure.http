@@ -1,0 +1,24 @@
+@Infrastructure_HostAddress = http://0.0.0.0:5260
+
+### Register a new account
+POST {{Infrastructure_HostAddress}}/api/account
+Accept: application/json
+Content-Type: application/json
+
+{
+    "nickname": "Alice",
+    "email": "alice.alright@test.com",
+    "firstName": "Alice",
+    "lastName": "Alright",
+    "birthDate": "1/1/2000"
+    
+}
+> {%
+    client.global.set("accountUid", response.body.uid);
+%}
+
+### Get the account
+GET {{Infrastructure_HostAddress}}/api/account/{{accountUid}}
+Accept: application/json
+
+###

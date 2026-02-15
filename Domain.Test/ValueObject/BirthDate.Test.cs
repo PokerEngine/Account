@@ -35,20 +35,20 @@ public class BirthDateTest
     public void Equality_WhenValid_ShouldCheck()
     {
         // Arrange & Act & Assert
-        Assert.True(new BirthDate(new DateOnly(1990, 1, 1)) == new BirthDate(new DateOnly(1990, 1, 1)));
-        Assert.False(new BirthDate(new DateOnly(1990, 1, 1)) == new BirthDate(new DateOnly(1990, 1, 2)));
+        Assert.True(new BirthDate(new DateOnly(2000, 1, 1)) == new BirthDate(new DateOnly(2000, 1, 1)));
+        Assert.False(new BirthDate(new DateOnly(2000, 1, 1)) == new BirthDate(new DateOnly(2000, 1, 2)));
 
-        Assert.False(new BirthDate(new DateOnly(1990, 1, 1)) != new BirthDate(new DateOnly(1990, 1, 1)));
-        Assert.True(new BirthDate(new DateOnly(1990, 1, 1)) != new BirthDate(new DateOnly(1990, 1, 2)));
+        Assert.False(new BirthDate(new DateOnly(2000, 1, 1)) != new BirthDate(new DateOnly(2000, 1, 1)));
+        Assert.True(new BirthDate(new DateOnly(2000, 1, 1)) != new BirthDate(new DateOnly(2000, 1, 2)));
     }
 
     [Fact]
     public void ToString_WhenValid_ShouldReturnValidString()
     {
         // Arrange
-        var birthDate = new BirthDate(new DateOnly(1990, 1, 1));
+        var birthDate = new BirthDate(new DateOnly(2000, 1, 1));
 
         // Act & Assert
-        Assert.Equal("1990-01-01", $"{birthDate}");
+        Assert.Equal("2000-01-01", $"{birthDate}");
     }
 }
