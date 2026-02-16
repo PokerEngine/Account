@@ -10,7 +10,7 @@ Content-Type: application/json
     "email": "alice.alright@test.com",
     "firstName": "Alice",
     "lastName": "Alright",
-    "birthDate": "1/1/2000"
+    "birthDate": "2000-01-01"
     
 }
 > {%

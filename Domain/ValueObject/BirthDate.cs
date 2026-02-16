@@ -1,4 +1,5 @@
 using Domain.Exception;
+using System.Globalization;
 
 namespace Domain.ValueObject;
 
@@ -6,6 +7,7 @@ public readonly struct BirthDate : IEquatable<BirthDate>
 {
     private readonly DateOnly _date;
 
+    private const string Format = "yyyy-MM-dd";
     private const int MinAge = 18;
 
     public int Age => GetAge(_date);
@@ -20,9 +22,10 @@ public readonly struct BirthDate : IEquatable<BirthDate>
         _date = date;
     }
 
-    public static BirthDate FromString(string value)
+    public static BirthDate FromString(string value, string format = Format)
     {
-        return new BirthDate(DateOnly.Parse(value));
+        var date = DateOnly.ParseExact(value, format, CultureInfo.InvariantCulture);
+        return new BirthDate(date);
     }
 
     private static int GetAge(DateOnly date)
@@ -55,5 +58,8 @@ public readonly struct BirthDate : IEquatable<BirthDate>
         => _date.GetHashCode();
 
     public override string ToString()
-        => _date.ToString();
+        => _date.ToString(Format);
+
+    public string ToString(string format = Format)
+         => _date.ToString(format, CultureInfo.InvariantCulture);
 }

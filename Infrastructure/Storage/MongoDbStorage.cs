@@ -42,7 +42,7 @@ public class MongoDbStorage : IStorage
             Email = document.Email,
             FirstName = document.FirstName,
             LastName = document.LastName,
-            BirthDate = document.BirthDate
+            BirthDate = document.BirthDate.ToString()
         };
     }
 
@@ -77,7 +77,7 @@ public class MongoDbStorage : IStorage
             Email = account.Email,
             FirstName = account.FirstName,
             LastName = account.LastName,
-            BirthDate = account.BirthDate
+            BirthDate = account.BirthDate.ToString()
         };
 
         await _detailViewCollection.FindOneAndReplaceAsync(x => x.Uid == (Guid)account.Uid, document, options);
@@ -99,7 +99,7 @@ public record DetailViewDocument
     public required string Email { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
-    public required DateOnly BirthDate { get; init; }
+    public required string BirthDate { get; init; }
 }
 
 public record UniquenessViewDocument

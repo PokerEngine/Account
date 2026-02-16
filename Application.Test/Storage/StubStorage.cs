@@ -63,7 +63,7 @@ public class StubStorage : IStorage
             Email = account.Email,
             FirstName = account.FirstName,
             LastName = account.LastName,
-            BirthDate = account.BirthDate
+            BirthDate = account.BirthDate.ToString()
         };
         _detailMapping.AddOrUpdate(account.Uid, view, (_, _) => view);
     }

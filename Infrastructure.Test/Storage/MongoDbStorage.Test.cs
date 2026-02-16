@@ -16,7 +16,7 @@ public class MongoDbStorageTest(MongoDbClientFixture fixture) : IClassFixture<Mo
     {
         // Arrange
         var storage = CreateStorage();
-        var account = RegisterAccount("Alice", "alice.alright@test.com", "Alice", "Alright", new DateOnly(2000, 1, 1));
+        var account = RegisterAccount("Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
         await storage.SaveViewAsync(account);
 
         // Act
@@ -28,7 +28,7 @@ public class MongoDbStorageTest(MongoDbClientFixture fixture) : IClassFixture<Mo
         Assert.Equal("alice.alright@test.com", view.Email);
         Assert.Equal("Alice", view.FirstName);
         Assert.Equal("Alright", view.LastName);
-        Assert.Equal(new DateOnly(2000, 1, 1), view.BirthDate);
+        Assert.Equal("2000-01-01", view.BirthDate);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class MongoDbStorageTest(MongoDbClientFixture fixture) : IClassFixture<Mo
         string email,
         string firstName,
         string lastName,
-        DateOnly birthDate
+        string birthDate
     )
     {
         return Account.FromScratch(
@@ -75,7 +75,7 @@ public class MongoDbStorageTest(MongoDbClientFixture fixture) : IClassFixture<Mo
             email: email,
             firstName: firstName,
             lastName: lastName,
-            birthDate: birthDate
+            birthDate: BirthDate.FromString(birthDate)
         );
     }
 }

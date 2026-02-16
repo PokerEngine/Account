@@ -3,6 +3,7 @@ using Application.Storage;
 using Application.UnitOfWork;
 using Domain.Entity;
 using Domain.Exception;
+using Domain.ValueObject;
 
 namespace Application.Command;
 
@@ -12,7 +13,7 @@ public record RegisterAccountCommand : ICommand
     public required string Email { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
-    public required DateOnly BirthDate { get; init; }
+    public required string BirthDate { get; init; }
 }
 
 public record RegisterAccountResponse : ICommandResponse
@@ -47,7 +48,7 @@ public class RegisterAccountHandler(
             email: command.Email,
             firstName: command.FirstName,
             lastName: command.LastName,
-            birthDate: command.BirthDate
+            birthDate: BirthDate.FromString(command.BirthDate)
         );
 
         unitOfWork.Register(account);

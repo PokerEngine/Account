@@ -17,7 +17,7 @@ public class AccountRegisteredEventHandler(
             Email = @event.Email,
             FirstName = @event.FirstName,
             LastName = @event.LastName,
-            BirthDate = @event.BirthDate,
+            BirthDate = @event.BirthDate.ToString(),
             OccurredAt = @event.OccurredAt
         };
 

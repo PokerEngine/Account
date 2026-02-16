@@ -23,7 +23,7 @@ public class RegisterAccountTest
             Email = "alice.alright@test.com",
             FirstName = "Alice",
             LastName = "Alright",
-            BirthDate = new DateOnly(2000, 1, 1)
+            BirthDate = "2000-01-01"
         };
         var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
 
@@ -37,7 +37,7 @@ public class RegisterAccountTest
         Assert.Equal(new Email("alice.alright@test.com"), account.Email);
         Assert.Equal(new FirstName("Alice"), account.FirstName);
         Assert.Equal(new LastName("Alright"), account.LastName);
-        Assert.Equal(new BirthDate(new DateOnly(2000, 1, 1)), account.BirthDate);
+        Assert.Equal(BirthDate.FromString("2000-01-01"), account.BirthDate);
 
         var detailView = await unitOfWork.Storage.GetDetailViewAsync(account.Uid);
         Assert.Equal((Guid)account.Uid, detailView.Uid);
@@ -52,7 +52,7 @@ public class RegisterAccountTest
     {
         // Arrange
         var unitOfWork = CreateUnitOfWork();
-        await RegisterAccountAsync(unitOfWork, "Alice", "alice.adams@test.com", "Alice", "Adams", new DateOnly(2000, 1, 1));
+        await RegisterAccountAsync(unitOfWork, "Alice", "alice.adams@test.com", "Alice", "Adams", "2000-01-01");
 
         var command = new RegisterAccountCommand
         {
@@ -60,7 +60,7 @@ public class RegisterAccountTest
             Email = "alice.alright@test.com",
             FirstName = "Alice",
             LastName = "Alright",
-            BirthDate = new DateOnly(2000, 1, 1)
+            BirthDate = "2000-01-01"
         };
         var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
 
@@ -79,7 +79,7 @@ public class RegisterAccountTest
     {
         // Arrange
         var unitOfWork = CreateUnitOfWork();
-        await RegisterAccountAsync(unitOfWork, "Alicia", "alice.alright@test.com", "Alicia", "Alright", new DateOnly(2000, 1, 1));
+        await RegisterAccountAsync(unitOfWork, "Alicia", "alice.alright@test.com", "Alicia", "Alright", "2000-01-01");
 
         var command = new RegisterAccountCommand
         {
@@ -87,7 +87,7 @@ public class RegisterAccountTest
             Email = "alice.alright@test.com",
             FirstName = "Alice",
             LastName = "Alright",
-            BirthDate = new DateOnly(2000, 1, 1)
+            BirthDate = "2000-01-01"
         };
         var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
 
@@ -107,7 +107,7 @@ public class RegisterAccountTest
         string email,
         string firstName,
         string lastName,
-        DateOnly birthDate
+        string birthDate
     )
     {
         var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
