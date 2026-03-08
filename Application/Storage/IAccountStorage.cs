@@ -2,9 +2,9 @@ using Domain.Entity;
 
 namespace Application.Storage;
 
-public interface IStorage
+public interface IAccountStorage
 {
-    Task<DetailView> GetDetailViewAsync(Guid accountUid);
+    Task<DetailView> GetDetailViewAsync(Guid uid);
     Task<bool> NicknameExistsAsync(string nickname);
     Task<bool> EmailExistsAsync(string email);
     Task SaveViewAsync(Account account);
@@ -18,4 +18,5 @@ public record DetailView
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public required string BirthDate { get; init; }
+    public required bool IsEmailVerified { get; init; }
 }

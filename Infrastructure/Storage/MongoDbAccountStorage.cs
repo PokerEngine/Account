@@ -8,12 +8,12 @@ using MongoDB.Driver;
 
 namespace Infrastructure.Storage;
 
-public class MongoDbStorage : IStorage
+public class MongoDbAccountStorage : IAccountStorage
 {
     private const string DetailViewCollectionName = "views_detail";
     private readonly IMongoCollection<DetailViewDocument> _detailViewCollection;
 
-    public MongoDbStorage(MongoDbClient client, IOptions<MongoDbStorageOptions> options)
+    public MongoDbAccountStorage(MongoDbClient client, IOptions<MongoDbStorageOptions> options)
     {
         var db = client.Client.GetDatabase(options.Value.Database);
 
@@ -24,7 +24,7 @@ public class MongoDbStorage : IStorage
     public async Task<DetailView> GetDetailViewAsync(Guid uid)
     {
         var document = await _detailViewCollection
-            .Find(x => x.Uid == (Guid)uid)
+            .Find(x => x.Uid == uid)
             .FirstOrDefaultAsync();
 
         if (document is null)
@@ -39,7 +39,8 @@ public class MongoDbStorage : IStorage
             Email = document.Email,
             FirstName = document.FirstName,
             LastName = document.LastName,
-            BirthDate = document.BirthDate.ToString()
+            BirthDate = document.BirthDate,
+            IsEmailVerified = document.IsEmailVerified
         };
     }
 
@@ -74,7 +75,8 @@ public class MongoDbStorage : IStorage
             Email = account.Email,
             FirstName = account.FirstName,
             LastName = account.LastName,
-            BirthDate = account.BirthDate.ToString()
+            BirthDate = account.BirthDate.ToString(),
+            IsEmailVerified = account.IsEmailVerified
         };
 
         await _detailViewCollection.FindOneAndReplaceAsync(x => x.Uid == (Guid)account.Uid, document, options);
@@ -83,7 +85,7 @@ public class MongoDbStorage : IStorage
 
 public class MongoDbStorageOptions
 {
-    public const string SectionName = "MongoDbStorage";
+    public const string SectionName = "MongoDbAccountStorage";
 
     public required string Database { get; init; }
 }
@@ -97,4 +99,5 @@ public record DetailViewDocument
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public required string BirthDate { get; init; }
+    public required bool IsEmailVerified { get; init; }
 }

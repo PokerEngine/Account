@@ -6,11 +6,11 @@ namespace Application.Test.UnitOfWork;
 
 public class StubUnitOfWork(
     StubRepository repository,
-    StubStorage storage,
+    StubAccountStorage accountStorage,
     StubEventDispatcher eventDispatcher
-) : Application.UnitOfWork.UnitOfWork(repository, storage, eventDispatcher)
+) : Application.UnitOfWork.UnitOfWork(repository, accountStorage, eventDispatcher)
 {
     public readonly StubRepository Repository = repository;
-    public readonly StubStorage Storage = storage;
+    public readonly StubAccountStorage AccountStorage = accountStorage;
     public readonly StubEventDispatcher EventDispatcher = eventDispatcher;
 }

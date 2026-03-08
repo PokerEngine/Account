@@ -18,7 +18,7 @@ public class GetAccountDetailTest
         var accountUid = await RegisterAccountAsync(unitOfWork, "Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
 
         var query = new GetAccountDetailQuery { Uid = accountUid };
-        var handler = new GetAccountDetailHandler(unitOfWork.Storage);
+        var handler = new GetAccountDetailHandler(unitOfWork.AccountStorage);
 
         // Act
         var response = await handler.HandleAsync(query);
@@ -36,7 +36,7 @@ public class GetAccountDetailTest
     public async Task HandleAsync_NotExists_ShouldThrowException()
     {
         // Arrange
-        var storage = new StubStorage();
+        var storage = new StubAccountStorage();
 
         var query = new GetAccountDetailQuery { Uid = Guid.NewGuid() };
         var handler = new GetAccountDetailHandler(storage);
@@ -60,7 +60,7 @@ public class GetAccountDetailTest
         string birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -77,7 +77,7 @@ public class GetAccountDetailTest
     private StubUnitOfWork CreateUnitOfWork()
     {
         var repository = new StubRepository();
-        var storage = new StubStorage();
+        var storage = new StubAccountStorage();
         var eventDispatcher = new StubEventDispatcher();
         return new StubUnitOfWork(repository, storage, eventDispatcher);
     }

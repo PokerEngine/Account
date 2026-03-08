@@ -25,7 +25,7 @@ public class RegisterAccountTest
             LastName = "Alright",
             BirthDate = "2000-01-01"
         };
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
 
         // Act
         var response = await handler.HandleAsync(command);
@@ -39,7 +39,7 @@ public class RegisterAccountTest
         Assert.Equal(new LastName("Alright"), account.LastName);
         Assert.Equal(BirthDate.FromString("2000-01-01"), account.BirthDate);
 
-        var detailView = await unitOfWork.Storage.GetDetailViewAsync(account.Uid);
+        var detailView = await unitOfWork.AccountStorage.GetDetailViewAsync(account.Uid);
         Assert.Equal((Guid)account.Uid, detailView.Uid);
 
         var events = await unitOfWork.EventDispatcher.GetDispatchedEvents(response.Uid);
@@ -62,7 +62,7 @@ public class RegisterAccountTest
             LastName = "Alright",
             BirthDate = "2000-01-01"
         };
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
 
         // Act
         var exc = await Assert.ThrowsAsync<NotUniqueNicknameException>(async () =>
@@ -89,7 +89,7 @@ public class RegisterAccountTest
             LastName = "Alright",
             BirthDate = "2000-01-01"
         };
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
 
         // Act
         var exc = await Assert.ThrowsAsync<NotUniqueEmailException>(async () =>
@@ -101,7 +101,7 @@ public class RegisterAccountTest
         Assert.Equal("An account with such email already exists", exc.Message);
     }
 
-    private async Task RegisterAccountAsync(
+    private async Task<Guid> RegisterAccountAsync(
         StubUnitOfWork unitOfWork,
         string nickname,
         string email,
@@ -110,7 +110,7 @@ public class RegisterAccountTest
         string birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.Storage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -121,12 +121,13 @@ public class RegisterAccountTest
         };
         var response = await handler.HandleAsync(command);
         await unitOfWork.EventDispatcher.ClearDispatchedEvents(response.Uid);
+        return response.Uid;
     }
 
     private StubUnitOfWork CreateUnitOfWork()
     {
         var repository = new StubRepository();
-        var storage = new StubStorage();
+        var storage = new StubAccountStorage();
         var eventDispatcher = new StubEventDispatcher();
         return new StubUnitOfWork(repository, storage, eventDispatcher);
     }

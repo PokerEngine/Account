@@ -42,11 +42,11 @@ public static class Bootstrapper
         );
         builder.Services.AddSingleton<IRepository, MongoDbRepository>();
 
-        // Register storage
+        // Register accountStorage
         builder.Services.Configure<MongoDbStorageOptions>(
             builder.Configuration.GetSection(MongoDbStorageOptions.SectionName)
         );
-        builder.Services.AddSingleton<IStorage, MongoDbStorage>();
+        builder.Services.AddSingleton<IAccountStorage, MongoDbAccountStorage>();
 
         // Register unit of work
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

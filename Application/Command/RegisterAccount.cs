@@ -23,7 +23,7 @@ public record RegisterAccountResponse : ICommandResponse
 
 public class RegisterAccountHandler(
     IRepository repository,
-    IStorage storage,
+    IAccountStorage accountStorage,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<RegisterAccountCommand, RegisterAccountResponse>
 {
@@ -32,12 +32,12 @@ public class RegisterAccountHandler(
         // We throw domain exceptions at the application layer to improve performance
         // because passing a full list of accounts to the domain layer is an overkill
 
-        if (await storage.NicknameExistsAsync(command.Nickname))
+        if (await accountStorage.NicknameExistsAsync(command.Nickname))
         {
             throw new NotUniqueNicknameException("An account with such nickname already exists");
         }
 
-        if (await storage.EmailExistsAsync(command.Email))
+        if (await accountStorage.EmailExistsAsync(command.Email))
         {
             throw new NotUniqueEmailException("An account with such email already exists");
         }

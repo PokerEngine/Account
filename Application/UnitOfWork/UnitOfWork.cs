@@ -7,7 +7,7 @@ namespace Application.UnitOfWork;
 
 public class UnitOfWork(
     IRepository repository,
-    IStorage storage,
+    IAccountStorage accountStorage,
     IEventDispatcher eventDispatcher
 ) : IUnitOfWork
 {
@@ -33,7 +33,7 @@ public class UnitOfWork(
 
             if (updateViews)
             {
-                await storage.SaveViewAsync(account);
+                await accountStorage.SaveViewAsync(account);
             }
 
             var context = new EventContext { AccountUid = account.Uid };

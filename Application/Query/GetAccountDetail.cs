@@ -18,12 +18,12 @@ public record GetAccountDetailResponse : IQueryResponse
 }
 
 public class GetAccountDetailHandler(
-    IStorage storage
+    IAccountStorage accountStorage
 ) : IQueryHandler<GetAccountDetailQuery, GetAccountDetailResponse>
 {
     public async Task<GetAccountDetailResponse> HandleAsync(GetAccountDetailQuery query)
     {
-        var view = await storage.GetDetailViewAsync(query.Uid);
+        var view = await accountStorage.GetDetailViewAsync(query.Uid);
 
         return new GetAccountDetailResponse
         {

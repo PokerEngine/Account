@@ -1,10 +1,14 @@
 using Application.IntegrationEvent;
+using Application.Service.MessageSender;
+using Application.Storage;
 using Domain.Event;
 
 namespace Application.Event;
 
 public class AccountRegisteredEventHandler(
-    IIntegrationEventPublisher integrationEventPublisher
+    IIntegrationEventPublisher integrationEventPublisher,
+    IEmailVerificationTokenStorage emailVerificationTokenStorage,
+    IMessageSender messageSender
 ) : IEventHandler<AccountRegisteredEvent>
 {
     public async Task HandleAsync(AccountRegisteredEvent @event, EventContext context)
@@ -22,5 +26,17 @@ public class AccountRegisteredEventHandler(
         };
 
         await integrationEventPublisher.PublishAsync(integrationEvent, "account.account-registered");
+
+        var token = await emailVerificationTokenStorage.GenerateTokenAsync(context.AccountUid);
+        var message = new Message
+        {
+            Header = "Email verification",
+            Content = $"[Verify email](/account/verify-email?token={token})" // TODO: implement URL template
+        };
+        var recipient = new Recipient
+        {
+            Email = @event.Email
+        };
+        await messageSender.SendAsync(message, recipient);
     }
 }

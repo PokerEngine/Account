@@ -5,13 +5,13 @@ using System.Collections.Concurrent;
 
 namespace Application.Test.Storage;
 
-public class StubStorage : IStorage
+public class StubAccountStorage : IAccountStorage
 {
     private readonly ConcurrentDictionary<Guid, DetailView> _detailMapping = new();
 
-    public Task<DetailView> GetDetailViewAsync(Guid accountUid)
+    public Task<DetailView> GetDetailViewAsync(Guid uid)
     {
-        if (!_detailMapping.TryGetValue(accountUid, out var view))
+        if (!_detailMapping.TryGetValue(uid, out var view))
         {
             throw new AccountNotFoundException("The account is not found");
         }
@@ -54,7 +54,8 @@ public class StubStorage : IStorage
             Email = account.Email,
             FirstName = account.FirstName,
             LastName = account.LastName,
-            BirthDate = account.BirthDate.ToString()
+            BirthDate = account.BirthDate.ToString(),
+            IsEmailVerified = account.IsEmailVerified
         };
         _detailMapping.AddOrUpdate(account.Uid, view, (_, _) => view);
         return Task.CompletedTask;
