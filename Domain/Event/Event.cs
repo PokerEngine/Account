@@ -17,3 +17,8 @@ public sealed record AccountRegisteredEvent : IEvent
     public required LastName LastName { get; init; }
     public required BirthDate BirthDate { get; init; }
 }
+
+public sealed record EmailVerifiedEvent : IEvent
+{
+    public required DateTime OccurredAt { get; init; }
+}

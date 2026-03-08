@@ -117,4 +117,53 @@ public class AccountTest
         // Assert
         Assert.Equal("AccountRegisteredEvent is not supported", exc.Message);
     }
+
+    [Fact]
+    public void VerifyEmail_WhenNotVerified_ShouldVerify()
+    {
+        // Arrange
+        var account = Account.FromScratch(
+            uid: new AccountUid(Guid.NewGuid()),
+            nickname: new Nickname("Alice"),
+            email: new Email("alice.alright@test.com"),
+            firstName: new FirstName("Alice"),
+            lastName: new LastName("Alright"),
+            birthDate: new BirthDate(new DateOnly(2000, 1, 1))
+        );
+        account.PullEvents();
+
+        // Act
+        account.VerifyEmail();
+
+        // Assert
+        Assert.True(account.IsEmailVerified);
+
+        var pulledEvents = account.PullEvents();
+        Assert.Single(pulledEvents);
+        Assert.IsType<EmailVerifiedEvent>(pulledEvents[0]);
+    }
+
+    [Fact]
+    public void VerifyEmail_WhenVerified_ShouldThrowException()
+    {
+        // Arrange
+        var account = Account.FromScratch(
+            uid: new AccountUid(Guid.NewGuid()),
+            nickname: new Nickname("Alice"),
+            email: new Email("alice.alright@test.com"),
+            firstName: new FirstName("Alice"),
+            lastName: new LastName("Alright"),
+            birthDate: new BirthDate(new DateOnly(2000, 1, 1))
+        );
+        account.VerifyEmail();
+        account.PullEvents();
+
+        // Act
+        var exc = Assert.Throws<EmailVerifiedException>(() => account.VerifyEmail());
+
+        // Assert
+        Assert.Equal("The account email is already verified", exc.Message);
+
+        Assert.Empty(account.PullEvents());
+    }
 }

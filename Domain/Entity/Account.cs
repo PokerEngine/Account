@@ -7,11 +7,12 @@ namespace Domain.Entity;
 public class Account
 {
     public AccountUid Uid { get; }
-    public Nickname Nickname { get; }
-    public Email Email { get; }
-    public FirstName FirstName { get; }
-    public LastName LastName { get; }
-    public BirthDate BirthDate { get; }
+    public Nickname Nickname { get; private set; }
+    public Email Email { get; private set; }
+    public FirstName FirstName { get; private set; }
+    public LastName LastName { get; private set; }
+    public BirthDate BirthDate { get; private set; }
+    public bool IsEmailVerified { get; private set; }
 
     private readonly List<IEvent> _events;
 
@@ -30,6 +31,7 @@ public class Account
         FirstName = firstName;
         LastName = lastName;
         BirthDate = birthDate;
+        IsEmailVerified = false;
         _events = [];
     }
 
@@ -86,6 +88,9 @@ public class Account
         {
             switch (@event)
             {
+                case EmailVerifiedEvent:
+                    account.VerifyEmail();
+                    break;
                 default:
                     throw new InvalidAccountStateException($"{@event.GetType().Name} is not supported");
             }
@@ -94,6 +99,22 @@ public class Account
         account.PullEvents();
 
         return account;
+    }
+
+    public void VerifyEmail()
+    {
+        if (IsEmailVerified)
+        {
+            throw new EmailVerifiedException("The account email is already verified");
+        }
+
+        IsEmailVerified = true;
+
+        var @event = new EmailVerifiedEvent
+        {
+            OccurredAt = DateTime.Now
+        };
+        AddEvent(@event);
     }
 
     # region Events

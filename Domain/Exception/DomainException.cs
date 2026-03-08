@@ -15,3 +15,5 @@ public class InvalidFirstNameException(string message) : DomainException(message
 public class InvalidLastNameException(string message) : DomainException(message);
 
 public class InvalidBirthDateException(string message) : DomainException(message);
+
+public class EmailVerifiedException(string message) : DomainException(message);
