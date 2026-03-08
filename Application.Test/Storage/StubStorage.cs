@@ -8,8 +8,6 @@ namespace Application.Test.Storage;
 public class StubStorage : IStorage
 {
     private readonly ConcurrentDictionary<Guid, DetailView> _detailMapping = new();
-    private readonly ConcurrentDictionary<Guid, string> _nicknameUniquenessMapping = new();
-    private readonly ConcurrentDictionary<Guid, string> _emailUniquenessMapping = new();
 
     public Task<DetailView> GetDetailViewAsync(Guid accountUid)
     {
@@ -23,9 +21,9 @@ public class StubStorage : IStorage
 
     public Task<bool> NicknameExistsAsync(string nickname)
     {
-        foreach (var kv in _nicknameUniquenessMapping)
+        foreach (var kv in _detailMapping)
         {
-            if (kv.Value == nickname)
+            if (kv.Value.Nickname == nickname)
             {
                 return Task.FromResult(true);
             }
@@ -36,9 +34,9 @@ public class StubStorage : IStorage
 
     public Task<bool> EmailExistsAsync(string email)
     {
-        foreach (var kv in _emailUniquenessMapping)
+        foreach (var kv in _detailMapping)
         {
-            if (kv.Value == email)
+            if (kv.Value.Email == email)
             {
                 return Task.FromResult(true);
             }
@@ -48,13 +46,6 @@ public class StubStorage : IStorage
     }
 
     public Task SaveViewAsync(Account account)
-    {
-        SaveDetailView(account);
-        SaveUniquenessView(account);
-        return Task.CompletedTask;
-    }
-
-    private void SaveDetailView(Account account)
     {
         var view = new DetailView
         {
@@ -66,11 +57,6 @@ public class StubStorage : IStorage
             BirthDate = account.BirthDate.ToString()
         };
         _detailMapping.AddOrUpdate(account.Uid, view, (_, _) => view);
-    }
-
-    private void SaveUniquenessView(Account account)
-    {
-        _nicknameUniquenessMapping.AddOrUpdate(account.Uid, account.Nickname, (_, _) => account.Nickname);
-        _emailUniquenessMapping.AddOrUpdate(account.Uid, account.Email, (_, _) => account.Email);
+        return Task.CompletedTask;
     }
 }

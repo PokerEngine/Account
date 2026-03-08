@@ -27,10 +27,10 @@ public class MongoDbRepository : IRepository
         return Task.FromResult(new AccountUid(Guid.NewGuid()));
     }
 
-    public async Task<List<IEvent>> GetEventsAsync(AccountUid handUid)
+    public async Task<List<IEvent>> GetEventsAsync(AccountUid accountUid)
     {
         var documents = await _collection
-            .Find(e => e.AccountUid == handUid)
+            .Find(e => e.AccountUid == accountUid)
             .SortBy(e => e.Id)
             .ToListAsync();
 
@@ -51,12 +51,12 @@ public class MongoDbRepository : IRepository
         return events;
     }
 
-    public async Task AddEventsAsync(AccountUid handUid, List<IEvent> events)
+    public async Task AddEventsAsync(AccountUid accountUid, List<IEvent> events)
     {
         var documents = events.Select(e => new EventDocument
         {
             Type = MongoDbEventTypeResolver.GetName(e),
-            AccountUid = handUid,
+            AccountUid = accountUid,
             OccurredAt = e.OccurredAt,
             Data = e.ToBsonDocument(e.GetType())
         });

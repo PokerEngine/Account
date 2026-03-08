@@ -11,16 +11,13 @@ namespace Infrastructure.Storage;
 public class MongoDbStorage : IStorage
 {
     private const string DetailViewCollectionName = "views_detail";
-    private const string UniquenessViewCollectionName = "views_uniqueness";
     private readonly IMongoCollection<DetailViewDocument> _detailViewCollection;
-    private readonly IMongoCollection<UniquenessViewDocument> _uniquenessViewCollection;
 
     public MongoDbStorage(MongoDbClient client, IOptions<MongoDbStorageOptions> options)
     {
         var db = client.Client.GetDatabase(options.Value.Database);
 
         _detailViewCollection = db.GetCollection<DetailViewDocument>(DetailViewCollectionName);
-        _uniquenessViewCollection = db.GetCollection<UniquenessViewDocument>(UniquenessViewCollectionName);
         // TODO: add unique indexes
     }
 
@@ -48,7 +45,7 @@ public class MongoDbStorage : IStorage
 
     public async Task<bool> NicknameExistsAsync(string nickname)
     {
-        var document = await _uniquenessViewCollection
+        var document = await _detailViewCollection
             .Find(x => x.Nickname == nickname)
             .FirstOrDefaultAsync();
         return document is not null;
@@ -56,7 +53,7 @@ public class MongoDbStorage : IStorage
 
     public async Task<bool> EmailExistsAsync(string email)
     {
-        var document = await _uniquenessViewCollection
+        var document = await _detailViewCollection
             .Find(x => x.Email == email)
             .FirstOrDefaultAsync();
         return document is not null;
@@ -100,12 +97,4 @@ public record DetailViewDocument
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public required string BirthDate { get; init; }
-}
-
-public record UniquenessViewDocument
-{
-    [BsonId]
-    public required Guid Uid { get; init; }
-    public required string Nickname { get; init; }
-    public required string Email { get; init; }
 }
