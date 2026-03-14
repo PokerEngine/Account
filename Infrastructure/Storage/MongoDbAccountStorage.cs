@@ -13,7 +13,7 @@ public class MongoDbAccountStorage : IAccountStorage
     private const string DetailViewCollectionName = "views_detail";
     private readonly IMongoCollection<DetailViewDocument> _detailViewCollection;
 
-    public MongoDbAccountStorage(MongoDbClient client, IOptions<MongoDbStorageOptions> options)
+    public MongoDbAccountStorage(MongoDbClient client, IOptions<MongoDbAccountStorageOptions> options)
     {
         var db = client.Client.GetDatabase(options.Value.Database);
 
@@ -83,14 +83,14 @@ public class MongoDbAccountStorage : IAccountStorage
     }
 }
 
-public class MongoDbStorageOptions
+public class MongoDbAccountStorageOptions
 {
     public const string SectionName = "MongoDbAccountStorage";
 
     public required string Database { get; init; }
 }
 
-public record DetailViewDocument
+internal record DetailViewDocument
 {
     [BsonId]
     public required Guid Uid { get; init; }

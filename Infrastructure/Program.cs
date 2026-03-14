@@ -3,6 +3,7 @@ using Application.Event;
 using Application.IntegrationEvent;
 using Application.Query;
 using Application.Repository;
+using Application.Service.MessageSender;
 using Application.Storage;
 using Application.UnitOfWork;
 using Domain.Event;
@@ -13,6 +14,7 @@ using Infrastructure.Event;
 using Infrastructure.IntegrationEvent;
 using Infrastructure.Query;
 using Infrastructure.Repository;
+using Infrastructure.Service.MessageSender;
 using Infrastructure.Storage;
 
 namespace Infrastructure;
@@ -42,17 +44,25 @@ public static class Bootstrapper
         );
         builder.Services.AddSingleton<IRepository, MongoDbRepository>();
 
-        // Register accountStorage
-        builder.Services.Configure<MongoDbStorageOptions>(
-            builder.Configuration.GetSection(MongoDbStorageOptions.SectionName)
+        // Register storages
+        builder.Services.Configure<MongoDbAccountStorageOptions>(
+            builder.Configuration.GetSection(MongoDbAccountStorageOptions.SectionName)
         );
         builder.Services.AddSingleton<IAccountStorage, MongoDbAccountStorage>();
+        builder.Services.Configure<MongoDbEmailVerificationTokenStorageOptions>(
+            builder.Configuration.GetSection(MongoDbEmailVerificationTokenStorageOptions.SectionName)
+        );
+        builder.Services.AddSingleton<IEmailVerificationTokenStorage, MongoDbEmailVerificationTokenStorage>();
+
+        // Register services
+        builder.Services.AddSingleton<IMessageSender, ConsoleMessageSender>();
 
         // Register unit of work
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // Register commands
         RegisterCommandHandler<RegisterAccountCommand, RegisterAccountHandler, RegisterAccountResponse>(builder.Services);
+        RegisterCommandHandler<VerifyEmailCommand, VerifyEmailHandler, VerifyEmailResponse>(builder.Services);
         builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 
         // Register queries
@@ -61,6 +71,7 @@ public static class Bootstrapper
 
         // Register domain events
         RegisterEventHandler<AccountRegisteredEvent, AccountRegisteredEventHandler>(builder.Services);
+        RegisterEventHandler<EmailVerifiedEvent, EmailVerifiedEventHandler>(builder.Services);
         builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
 
         // Register integration events

@@ -11,11 +11,19 @@ Content-Type: application/json
     "firstName": "Alice",
     "lastName": "Alright",
     "birthDate": "2000-01-01"
-    
 }
 > {%
     client.global.set("accountUid", response.body.uid);
 %}
+
+### Verify the email
+POST {{Infrastructure_HostAddress}}/api/verify-email
+Accept: application/json
+Content-Type: application/json
+
+{
+    "token": "abcdef"
+}
 
 ### Get the account
 GET {{Infrastructure_HostAddress}}/api/account/{{accountUid}}

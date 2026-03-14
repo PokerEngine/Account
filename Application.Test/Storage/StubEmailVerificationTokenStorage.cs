@@ -12,7 +12,7 @@ public class StubEmailVerificationTokenStorage(TimeSpan ttl) : IEmailVerificatio
 
     public Task<string> GenerateTokenAsync(Guid accountUid)
     {
-        var token = GenerateRandomString(Length);
+        var token = GenerateRandomString();
 
         var entry = new EmailVerificationTokenEntry
         {
@@ -56,9 +56,9 @@ public class StubEmailVerificationTokenStorage(TimeSpan ttl) : IEmailVerificatio
         return Task.CompletedTask;
     }
 
-    private string GenerateRandomString(int length)
+    private string GenerateRandomString()
     {
-        var bytes = RandomNumberGenerator.GetBytes(length);
+        var bytes = RandomNumberGenerator.GetBytes(Length);
         return Convert.ToBase64String(bytes);
     }
 }

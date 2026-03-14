@@ -22,6 +22,16 @@ public class AccountController(
         return CreatedAtAction(nameof(GetAccountDetail), new { uid = response.Uid }, response);
     }
 
+    [HttpPost("verify-email")]
+    [ProducesResponseType(typeof(VerifyEmailResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailCommand command)
+    {
+        var response = await commandDispatcher.DispatchAsync<VerifyEmailCommand, VerifyEmailResponse>(command);
+        return Ok(response);
+    }
+
     [HttpGet("{uid:guid}")]
     [ProducesResponseType(typeof(GetAccountDetailResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

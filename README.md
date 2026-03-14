@@ -23,8 +23,8 @@ It might be helpful when you need to clear all data and run the project from scr
 ### How to run tests?
 ```shell
 docker compose run --rm account dotnet test
-docker compose run --rm account dotnet test src/Infrastructure.Test
-docker compose run --rm account dotnet test src/Infrastructure.Test --filter "FullyQualifiedName=Infrastructure.Test.WorkerTest.TestTableCreate"
+docker compose run --rm account dotnet test Infrastructure.Test
+docker compose run --rm account dotnet test Infrastructure.Test --filter Category=Integration
 ```
 
 ### How to run formatting?
