@@ -1,5 +1,5 @@
 # Account
-A service which is responsible for account management, including authentication
+A service which is responsible for account management
 
 ## Cookbook
 
