@@ -1,23 +1,22 @@
 using Application.Exception;
 using Application.Repository;
 using Domain.Event;
-using Domain.ValueObject;
 using System.Collections.Concurrent;
 
 namespace Application.Test.Repository;
 
 public class StubRepository : IRepository
 {
-    private readonly ConcurrentDictionary<AccountUid, List<IEvent>> _mapping = new();
+    private readonly ConcurrentDictionary<Guid, List<IEvent>> _mapping = new();
 
-    public Task<AccountUid> GetNextUidAsync()
+    public Task<Guid> GetNextUidAsync()
     {
-        return Task.FromResult(new AccountUid(Guid.NewGuid()));
+        return Task.FromResult(Guid.NewGuid());
     }
 
-    public Task<List<IEvent>> GetEventsAsync(AccountUid accountUid)
+    public Task<List<IEvent>> GetEventsAsync(Guid uid)
     {
-        if (!_mapping.TryGetValue(accountUid, out var events))
+        if (!_mapping.TryGetValue(uid, out var events))
         {
             throw new AccountNotFoundException("The account is not found");
         }
@@ -29,9 +28,9 @@ public class StubRepository : IRepository
         return Task.FromResult(snapshot);
     }
 
-    public Task AddEventsAsync(AccountUid accountUid, List<IEvent> events)
+    public Task AddEventsAsync(Guid uid, List<IEvent> events)
     {
-        var items = _mapping.GetOrAdd(accountUid, _ => new List<IEvent>());
+        var items = _mapping.GetOrAdd(uid, _ => new List<IEvent>());
         lock (items)
             items.AddRange(events);
 

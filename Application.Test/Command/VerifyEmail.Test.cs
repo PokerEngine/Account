@@ -33,10 +33,7 @@ public class VerifyEmailTest
         var account = Account.FromEvents(accountUid, await unitOfWork.Repository.GetEventsAsync(accountUid));
         Assert.True(account.IsEmailVerified);
 
-        var detailView = await unitOfWork.AccountStorage.GetDetailViewAsync(account.Uid);
-        Assert.Equal((Guid)account.Uid, detailView.Uid);
-
-        var events = await unitOfWork.EventDispatcher.GetDispatchedEvents(account.Uid);
+        var events = unitOfWork.EventDispatcher.GetDispatchedEvents();
         Assert.Single(events);
         Assert.IsType<EmailVerifiedEvent>(events[0]);
     }
@@ -99,7 +96,8 @@ public class VerifyEmailTest
         string birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
+        var accountStorage = new StubAccountStorage();
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -109,15 +107,14 @@ public class VerifyEmailTest
             BirthDate = birthDate
         };
         var response = await handler.HandleAsync(command);
-        await unitOfWork.EventDispatcher.ClearDispatchedEvents(response.Uid);
+        unitOfWork.EventDispatcher.ClearDispatchedEvents();
         return response.Uid;
     }
 
     private StubUnitOfWork CreateUnitOfWork()
     {
         var repository = new StubRepository();
-        var storage = new StubAccountStorage();
         var eventDispatcher = new StubEventDispatcher();
-        return new StubUnitOfWork(repository, storage, eventDispatcher);
+        return new StubUnitOfWork(repository, eventDispatcher);
     }
 }

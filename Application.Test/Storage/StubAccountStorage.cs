@@ -1,6 +1,5 @@
 using Application.Exception;
 using Application.Storage;
-using Domain.Entity;
 using System.Collections.Concurrent;
 
 namespace Application.Test.Storage;
@@ -45,19 +44,20 @@ public class StubAccountStorage : IAccountStorage
         return Task.FromResult(false);
     }
 
-    public Task SaveViewAsync(Account account)
+    public Task SaveViewAsync(DetailView view)
     {
-        var view = new DetailView
+        _detailMapping.AddOrUpdate(view.Uid, view, (_, _) => view);
+        return Task.CompletedTask;
+    }
+
+    public Task MarkEmailVerifiedAsync(Guid uid)
+    {
+        if (_detailMapping.TryGetValue(uid, out var view))
         {
-            Uid = account.Uid,
-            Nickname = account.Nickname,
-            Email = account.Email,
-            FirstName = account.FirstName,
-            LastName = account.LastName,
-            BirthDate = account.BirthDate.ToString(),
-            IsEmailVerified = account.IsEmailVerified
-        };
-        _detailMapping.AddOrUpdate(account.Uid, view, (_, _) => view);
+            var updated = view with { IsEmailVerified = true };
+            _detailMapping.AddOrUpdate(uid, updated, (_, _) => updated);
+        }
+
         return Task.CompletedTask;
     }
 }

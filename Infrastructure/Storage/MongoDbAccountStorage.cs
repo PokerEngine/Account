@@ -1,6 +1,5 @@
 using Application.Exception;
 using Application.Storage;
-using Domain.Entity;
 using Infrastructure.Client.MongoDb;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Attributes;
@@ -60,7 +59,7 @@ public class MongoDbAccountStorage : IAccountStorage
         return document is not null;
     }
 
-    public async Task SaveViewAsync(Account account)
+    public async Task SaveViewAsync(DetailView view)
     {
         var options = new FindOneAndReplaceOptions<DetailViewDocument>
         {
@@ -70,16 +69,23 @@ public class MongoDbAccountStorage : IAccountStorage
 
         var document = new DetailViewDocument
         {
-            Uid = account.Uid,
-            Nickname = account.Nickname,
-            Email = account.Email,
-            FirstName = account.FirstName,
-            LastName = account.LastName,
-            BirthDate = account.BirthDate.ToString(),
-            IsEmailVerified = account.IsEmailVerified
+            Uid = view.Uid,
+            Nickname = view.Nickname,
+            Email = view.Email,
+            FirstName = view.FirstName,
+            LastName = view.LastName,
+            BirthDate = view.BirthDate,
+            IsEmailVerified = view.IsEmailVerified
         };
 
-        await _detailViewCollection.FindOneAndReplaceAsync(x => x.Uid == (Guid)account.Uid, document, options);
+        await _detailViewCollection.FindOneAndReplaceAsync(x => x.Uid == view.Uid, document, options);
+    }
+
+    public async Task MarkEmailVerifiedAsync(Guid uid)
+    {
+        var filter = Builders<DetailViewDocument>.Filter.Eq(x => x.Uid, uid);
+        var update = Builders<DetailViewDocument>.Update.Set(x => x.IsEmailVerified, true);
+        await _detailViewCollection.UpdateOneAsync(filter, update);
     }
 }
 

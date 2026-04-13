@@ -4,7 +4,6 @@ namespace Domain.Event;
 
 public interface IEvent
 {
-    AccountUid AccountUid { init; get; }
     DateTime OccurredAt { init; get; }
 }
 

@@ -17,7 +17,7 @@ public class MongoDbAccountStorageTest(MongoDbClientFixture fixture) : IClassFix
         // Arrange
         var storage = CreateStorage();
         var account = RegisterAccount("Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
-        await storage.SaveViewAsync(account);
+        await storage.SaveViewAsync(BuildView(account));
 
         // Act
         var view = await storage.GetDetailViewAsync(account.Uid);
@@ -29,6 +29,23 @@ public class MongoDbAccountStorageTest(MongoDbClientFixture fixture) : IClassFix
         Assert.Equal("Alice", view.FirstName);
         Assert.Equal("Alright", view.LastName);
         Assert.Equal("2000-01-01", view.BirthDate);
+        Assert.False(view.IsEmailVerified);
+    }
+
+    [Fact]
+    public async Task MarkEmailVerifiedAsync_WhenExists_ShouldUpdate()
+    {
+        // Arrange
+        var storage = CreateStorage();
+        var account = RegisterAccount("Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
+        await storage.SaveViewAsync(BuildView(account));
+
+        // Act
+        await storage.MarkEmailVerifiedAsync(account.Uid);
+
+        // Assert
+        var view = await storage.GetDetailViewAsync(account.Uid);
+        Assert.True(view.IsEmailVerified);
     }
 
     [Fact]
@@ -78,4 +95,15 @@ public class MongoDbAccountStorageTest(MongoDbClientFixture fixture) : IClassFix
             birthDate: BirthDate.FromString(birthDate)
         );
     }
+
+    private static DetailView BuildView(Account account) => new()
+    {
+        Uid = account.Uid,
+        Nickname = account.Nickname,
+        Email = account.Email,
+        FirstName = account.FirstName,
+        LastName = account.LastName,
+        BirthDate = account.BirthDate.ToString(),
+        IsEmailVerified = account.IsEmailVerified
+    };
 }

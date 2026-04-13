@@ -8,7 +8,8 @@ namespace Application.Event;
 public class AccountRegisteredEventHandler(
     IIntegrationEventPublisher integrationEventPublisher,
     IEmailVerificationTokenStorage emailVerificationTokenStorage,
-    IMessageSender messageSender
+    IMessageSender messageSender,
+    IAccountStorage accountStorage
 ) : IEventHandler<AccountRegisteredEvent>
 {
     public async Task HandleAsync(AccountRegisteredEvent @event)
@@ -26,6 +27,17 @@ public class AccountRegisteredEventHandler(
         };
 
         await integrationEventPublisher.PublishAsync(integrationEvent, "account.account-registered");
+
+        await accountStorage.SaveViewAsync(new DetailView
+        {
+            Uid = @event.AccountUid,
+            Nickname = @event.Nickname,
+            Email = @event.Email,
+            FirstName = @event.FirstName,
+            LastName = @event.LastName,
+            BirthDate = @event.BirthDate.ToString(),
+            IsEmailVerified = false
+        });
 
         var token = await emailVerificationTokenStorage.GenerateTokenAsync(@event.AccountUid);
         var message = new Message

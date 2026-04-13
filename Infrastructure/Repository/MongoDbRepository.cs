@@ -1,7 +1,6 @@
 using Application.Exception;
 using Application.Repository;
 using Domain.Event;
-using Domain.ValueObject;
 using Infrastructure.Client.MongoDb;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -22,12 +21,12 @@ public class MongoDbRepository : IRepository
         _collection = db.GetCollection<EventDocument>(CollectionName);
     }
 
-    public Task<AccountUid> GetNextUidAsync()
+    public Task<Guid> GetNextUidAsync()
     {
-        return Task.FromResult(new AccountUid(Guid.NewGuid()));
+        return Task.FromResult(Guid.NewGuid());
     }
 
-    public async Task<List<IEvent>> GetEventsAsync(AccountUid uid)
+    public async Task<List<IEvent>> GetEventsAsync(Guid uid)
     {
         var documents = await _collection
             .Find(e => e.AccountUid == uid)
@@ -51,7 +50,7 @@ public class MongoDbRepository : IRepository
         return events;
     }
 
-    public async Task AddEventsAsync(AccountUid uid, List<IEvent> events)
+    public async Task AddEventsAsync(Guid uid, List<IEvent> events)
     {
         var documents = events.Select(e => new EventDocument
         {
@@ -78,7 +77,7 @@ internal sealed class EventDocument
     public ObjectId Id { get; init; }
 
     public required string Type { get; init; }
-    public required AccountUid AccountUid { get; init; }
+    public required Guid AccountUid { get; init; }
     public required DateTime OccurredAt { get; init; }
     public required BsonDocument Data { get; init; }
 }

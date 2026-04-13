@@ -1,6 +1,7 @@
 using Application.Command;
 using Application.Exception;
 using Application.Query;
+using Application.Storage;
 using Application.Test.Event;
 using Application.Test.Repository;
 using Application.Test.Storage;
@@ -15,10 +16,11 @@ public class GetAccountDetailTest
     {
         // Arrange
         var unitOfWork = CreateUnitOfWork();
-        var accountUid = await RegisterAccountAsync(unitOfWork, "Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
+        var accountStorage = new StubAccountStorage();
+        var accountUid = await RegisterAccountAsync(unitOfWork, accountStorage, "Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
 
         var query = new GetAccountDetailQuery { Uid = accountUid };
-        var handler = new GetAccountDetailHandler(unitOfWork.AccountStorage);
+        var handler = new GetAccountDetailHandler(accountStorage);
 
         // Act
         var response = await handler.HandleAsync(query);
@@ -36,10 +38,10 @@ public class GetAccountDetailTest
     public async Task HandleAsync_NotExists_ShouldThrowException()
     {
         // Arrange
-        var storage = new StubAccountStorage();
+        var accountStorage = new StubAccountStorage();
 
         var query = new GetAccountDetailQuery { Uid = Guid.NewGuid() };
-        var handler = new GetAccountDetailHandler(storage);
+        var handler = new GetAccountDetailHandler(accountStorage);
 
         // Act
         var exc = await Assert.ThrowsAsync<AccountNotFoundException>(async () =>
@@ -53,6 +55,7 @@ public class GetAccountDetailTest
 
     private async Task<Guid> RegisterAccountAsync(
         StubUnitOfWork unitOfWork,
+        StubAccountStorage accountStorage,
         string nickname,
         string email,
         string firstName,
@@ -60,7 +63,7 @@ public class GetAccountDetailTest
         string birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, unitOfWork.AccountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -70,15 +73,26 @@ public class GetAccountDetailTest
             BirthDate = birthDate
         };
         var response = await handler.HandleAsync(command);
-        await unitOfWork.EventDispatcher.ClearDispatchedEvents(response.Uid);
+
+        await accountStorage.SaveViewAsync(new DetailView
+        {
+            Uid = response.Uid,
+            Nickname = nickname,
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName,
+            BirthDate = birthDate,
+            IsEmailVerified = false
+        });
+
+        unitOfWork.EventDispatcher.ClearDispatchedEvents();
         return response.Uid;
     }
 
     private StubUnitOfWork CreateUnitOfWork()
     {
         var repository = new StubRepository();
-        var storage = new StubAccountStorage();
         var eventDispatcher = new StubEventDispatcher();
-        return new StubUnitOfWork(repository, storage, eventDispatcher);
+        return new StubUnitOfWork(repository, eventDispatcher);
     }
 }
