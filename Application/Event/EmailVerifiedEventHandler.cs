@@ -7,12 +7,12 @@ public class EmailVerifiedEventHandler(
     IIntegrationEventPublisher integrationEventPublisher
 ) : IEventHandler<EmailVerifiedEvent>
 {
-    public async Task HandleAsync(EmailVerifiedEvent @event, EventContext context)
+    public async Task HandleAsync(EmailVerifiedEvent @event)
     {
         var integrationEvent = new EmailVerifiedIntegrationEvent
         {
             Uid = Guid.NewGuid(),
-            AccountUid = context.AccountUid,
+            AccountUid = @event.AccountUid,
             OccurredAt = @event.OccurredAt
         };
 

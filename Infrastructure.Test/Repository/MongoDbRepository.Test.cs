@@ -20,6 +20,7 @@ public class MongoDbRepositoryTest(MongoDbClientFixture fixture) : IClassFixture
         var accountUid = new AccountUid(Guid.NewGuid());
         var @event = new TestEvent
         {
+            AccountUid = accountUid,
             Nickname = new Nickname("Alice"),
             Email = new Email("alice.alright@test.com"),
             FirstName = new FirstName("Alice"),
@@ -47,6 +48,7 @@ public class MongoDbRepositoryTest(MongoDbClientFixture fixture) : IClassFixture
         var accountUid = new AccountUid(Guid.NewGuid());
         var @event = new TestEvent
         {
+            AccountUid = accountUid,
             Nickname = new Nickname("Alice"),
             Email = new Email("alice.alright@test.com"),
             FirstName = new FirstName("Alice"),
@@ -89,6 +91,7 @@ public class MongoDbRepositoryTest(MongoDbClientFixture fixture) : IClassFixture
 
 internal sealed record TestEvent : IEvent
 {
+    public required AccountUid AccountUid { get; init; }
     public required Nickname Nickname { get; init; }
     public required Email Email { get; init; }
     public required FirstName FirstName { get; init; }

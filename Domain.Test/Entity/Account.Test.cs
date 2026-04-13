@@ -60,6 +60,7 @@ public class AccountTest
         {
             new AccountRegisteredEvent
             {
+                AccountUid = uid,
                 Nickname = nickname,
                 Email = email,
                 FirstName = firstName,
@@ -93,6 +94,7 @@ public class AccountTest
         {
             new AccountRegisteredEvent
             {
+                AccountUid = uid,
                 Nickname = new Nickname("Alice"),
                 Email =  new Email("alice.alright@test.com"),
                 FirstName = new FirstName("Alice"),
@@ -102,6 +104,7 @@ public class AccountTest
             },
             new AccountRegisteredEvent
             {
+                AccountUid = uid,
                 Nickname = new Nickname("Alice"),
                 Email =  new Email("alice.alright@test.com"),
                 FirstName = new FirstName("Alice"),

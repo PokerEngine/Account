@@ -36,10 +36,9 @@ public class UnitOfWork(
                 await accountStorage.SaveViewAsync(account);
             }
 
-            var context = new EventContext { AccountUid = account.Uid };
             foreach (var @event in events)
             {
-                await eventDispatcher.DispatchAsync(@event, context);
+                await eventDispatcher.DispatchAsync(@event);
             }
         }
 

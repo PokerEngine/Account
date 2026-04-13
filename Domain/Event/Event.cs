@@ -4,11 +4,13 @@ namespace Domain.Event;
 
 public interface IEvent
 {
+    AccountUid AccountUid { init; get; }
     DateTime OccurredAt { init; get; }
 }
 
 public sealed record AccountRegisteredEvent : IEvent
 {
+    public required AccountUid AccountUid { get; init; }
     public required DateTime OccurredAt { get; init; }
 
     public required Nickname Nickname { get; init; }
@@ -20,5 +22,6 @@ public sealed record AccountRegisteredEvent : IEvent
 
 public sealed record EmailVerifiedEvent : IEvent
 {
+    public required AccountUid AccountUid { get; init; }
     public required DateTime OccurredAt { get; init; }
 }

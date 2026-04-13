@@ -55,6 +55,7 @@ public class Account
 
         var @event = new AccountRegisteredEvent
         {
+            AccountUid = uid,
             Nickname = nickname,
             Email = email,
             FirstName = firstName,
@@ -112,6 +113,7 @@ public class Account
 
         var @event = new EmailVerifiedEvent
         {
+            AccountUid = Uid,
             OccurredAt = DateTime.UtcNow
         };
         AddEvent(@event);

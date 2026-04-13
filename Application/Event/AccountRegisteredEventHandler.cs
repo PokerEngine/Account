@@ -11,12 +11,12 @@ public class AccountRegisteredEventHandler(
     IMessageSender messageSender
 ) : IEventHandler<AccountRegisteredEvent>
 {
-    public async Task HandleAsync(AccountRegisteredEvent @event, EventContext context)
+    public async Task HandleAsync(AccountRegisteredEvent @event)
     {
         var integrationEvent = new AccountRegisteredIntegrationEvent
         {
             Uid = Guid.NewGuid(),
-            AccountUid = context.AccountUid,
+            AccountUid = @event.AccountUid,
             Nickname = @event.Nickname,
             Email = @event.Email,
             FirstName = @event.FirstName,
@@ -27,7 +27,7 @@ public class AccountRegisteredEventHandler(
 
         await integrationEventPublisher.PublishAsync(integrationEvent, "account.account-registered");
 
-        var token = await emailVerificationTokenStorage.GenerateTokenAsync(context.AccountUid);
+        var token = await emailVerificationTokenStorage.GenerateTokenAsync(@event.AccountUid);
         var message = new Message
         {
             Header = "Email verification",
