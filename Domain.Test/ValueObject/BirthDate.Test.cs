@@ -24,7 +24,7 @@ public class BirthDateTest
     public void Constructor_WhenLessThan18_ShouldThrowException()
     {
         // Arrange
-        var date = DateOnly.FromDateTime(DateTime.Now.AddYears(-17));
+        var date = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-17));
 
         // Arrange & Act & Assert
         var exc = Assert.Throws<InvalidBirthDateException>(() => new BirthDate(date));

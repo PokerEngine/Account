@@ -60,7 +60,7 @@ public class Account
             FirstName = firstName,
             LastName = lastName,
             BirthDate = birthDate,
-            OccurredAt = DateTime.Now
+            OccurredAt = DateTime.UtcNow
         };
         account.AddEvent(@event);
 
@@ -112,7 +112,7 @@ public class Account
 
         var @event = new EmailVerifiedEvent
         {
-            OccurredAt = DateTime.Now
+            OccurredAt = DateTime.UtcNow
         };
         AddEvent(@event);
     }
