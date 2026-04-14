@@ -4,6 +4,6 @@ namespace Application.UnitOfWork;
 
 public interface IUnitOfWork
 {
-    void Register(IAggregateRoot aggregate);
+    void Register(Account account);
     Task CommitAsync();
 }

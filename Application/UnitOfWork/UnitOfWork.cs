@@ -10,36 +10,27 @@ public class UnitOfWork(
     IEventDispatcher eventDispatcher
 ) : IUnitOfWork
 {
-    private readonly HashSet<IAggregateRoot> _aggregates = [];
+    private readonly List<Func<Task>> _commits = [];
 
-    public void Register(IAggregateRoot aggregate)
-    {
-        _aggregates.Add(aggregate);
-    }
+    public void Register(Account account) =>
+        _commits.Add(() => CommitAsync(
+            account,
+            events => repository.AddEventsAsync(account.Uid, events)
+        ));
 
     public async Task CommitAsync()
     {
-        var committed = new List<(IAggregateRoot Aggregate, List<IEvent> Events)>();
+        foreach (var commit in _commits)
+            await commit();
+        _commits.Clear();
+    }
 
-        foreach (var aggregate in _aggregates)
-        {
-            var events = aggregate.PullEvents();
-            if (events.Count > 0)
-                committed.Add((aggregate, events));
-        }
-
-        try
-        {
-            foreach (var (aggregate, events) in committed)
-                await repository.AddEventsAsync(aggregate.Uid, events);
-
-            foreach (var (_, events) in committed)
-                foreach (var @event in events)
-                    await eventDispatcher.DispatchAsync(@event);
-        }
-        finally
-        {
-            _aggregates.Clear();
-        }
+    private async Task CommitAsync(IAggregateRoot aggregate, Func<List<IEvent>, Task> persist)
+    {
+        var events = aggregate.PullEvents();
+        if (events.Count == 0) return;
+        await persist(events);
+        foreach (var @event in events)
+            await eventDispatcher.DispatchAsync(@event);
     }
 }

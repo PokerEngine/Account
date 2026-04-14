@@ -6,7 +6,6 @@ namespace Domain.Entity;
 
 public class Account : IAggregateRoot
 {
-    Guid IAggregateRoot.Uid => Uid;
     public AccountUid Uid { get; }
     public Nickname Nickname { get; private set; }
     public Email Email { get; private set; }
