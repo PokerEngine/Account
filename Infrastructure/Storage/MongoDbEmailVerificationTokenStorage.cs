@@ -70,7 +70,7 @@ public class MongoDbEmailVerificationTokenStorage : IEmailVerificationTokenStora
     private string GenerateRandomString()
     {
         var bytes = RandomNumberGenerator.GetBytes(_options.Length / 2);
-        return Convert.ToHexString(bytes);
+        return Convert.ToHexStringLower(bytes);
     }
 }
 

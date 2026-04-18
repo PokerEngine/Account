@@ -17,12 +17,12 @@ Content-Type: application/json
 %}
 
 ### Verify the email
-POST {{Api_HostAddress}}/api/verify-email
+POST {{Api_HostAddress}}/api/account/verify-email
 Accept: application/json
 Content-Type: application/json
 
 {
-    "token": "abcdef"
+    "verificationToken": "verification-token-from-email"
 }
 
 ### Get the account

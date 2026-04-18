@@ -18,11 +18,11 @@ public class VerifyEmailTest
         var emailVerificationTokenStorage = new StubEmailVerificationTokenStorage(new TimeSpan(0, 5, 0));
         var unitOfWork = CreateUnitOfWork();
         var accountUid = await RegisterAccountAsync(unitOfWork, "Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
-        var token = await emailVerificationTokenStorage.GenerateTokenAsync(accountUid);
+        var verificationToken = await emailVerificationTokenStorage.GenerateTokenAsync(accountUid);
 
         var command = new VerifyEmailCommand
         {
-            Token = token
+            VerificationToken = verificationToken
         };
         var handler = new VerifyEmailHandler(unitOfWork.Repository, emailVerificationTokenStorage, unitOfWork);
 
@@ -48,7 +48,7 @@ public class VerifyEmailTest
 
         var command = new VerifyEmailCommand
         {
-            Token = "unknown-token"
+            VerificationToken = "unknown-token"
         };
         var handler = new VerifyEmailHandler(unitOfWork.Repository, emailVerificationTokenStorage, unitOfWork);
 
@@ -69,11 +69,11 @@ public class VerifyEmailTest
         var emailVerificationTokenStorage = new StubEmailVerificationTokenStorage(new TimeSpan(0, 0, 0));
         var unitOfWork = CreateUnitOfWork();
         var accountUid = await RegisterAccountAsync(unitOfWork, "Alice", "alice.alright@test.com", "Alice", "Alright", "2000-01-01");
-        var token = await emailVerificationTokenStorage.GenerateTokenAsync(accountUid);
+        var verificationToken = await emailVerificationTokenStorage.GenerateTokenAsync(accountUid);
 
         var command = new VerifyEmailCommand
         {
-            Token = token
+            VerificationToken = verificationToken
         };
         var handler = new VerifyEmailHandler(unitOfWork.Repository, emailVerificationTokenStorage, unitOfWork);
 
