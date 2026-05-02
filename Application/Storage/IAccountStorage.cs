@@ -2,9 +2,9 @@ namespace Application.Storage;
 
 public interface IAccountStorage
 {
-    Task<DetailView> GetDetailViewAsync(Guid uid);
     Task<bool> NicknameExistsAsync(string nickname);
     Task<bool> EmailExistsAsync(string email);
+    Task<DetailView> GetDetailViewAsync(Guid uid);
     Task SaveViewAsync(DetailView view);
     Task MarkEmailVerifiedAsync(Guid uid);
 }

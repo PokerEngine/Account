@@ -4,10 +4,10 @@ using Application.Test.Repository;
 namespace Application.Test.UnitOfWork;
 
 public class StubUnitOfWork(
-    StubRepository repository,
+    StubAccountRepository accountRepository,
     StubEventDispatcher eventDispatcher
-) : Application.UnitOfWork.UnitOfWork(repository, eventDispatcher)
+) : Application.UnitOfWork.UnitOfWork(accountRepository, eventDispatcher)
 {
-    public readonly StubRepository Repository = repository;
+    public readonly StubAccountRepository AccountRepository = accountRepository;
     public readonly StubEventDispatcher EventDispatcher = eventDispatcher;
 }

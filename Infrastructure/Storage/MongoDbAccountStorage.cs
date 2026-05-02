@@ -20,6 +20,22 @@ public class MongoDbAccountStorage : IAccountStorage
         // TODO: add unique indexes
     }
 
+    public async Task<bool> NicknameExistsAsync(string nickname)
+    {
+        var document = await _detailViewCollection
+            .Find(x => x.Nickname == nickname)
+            .FirstOrDefaultAsync();
+        return document is not null;
+    }
+
+    public async Task<bool> EmailExistsAsync(string email)
+    {
+        var document = await _detailViewCollection
+            .Find(x => x.Email == email)
+            .FirstOrDefaultAsync();
+        return document is not null;
+    }
+
     public async Task<DetailView> GetDetailViewAsync(Guid uid)
     {
         var document = await _detailViewCollection
@@ -41,22 +57,6 @@ public class MongoDbAccountStorage : IAccountStorage
             BirthDate = document.BirthDate,
             IsEmailVerified = document.IsEmailVerified
         };
-    }
-
-    public async Task<bool> NicknameExistsAsync(string nickname)
-    {
-        var document = await _detailViewCollection
-            .Find(x => x.Nickname == nickname)
-            .FirstOrDefaultAsync();
-        return document is not null;
-    }
-
-    public async Task<bool> EmailExistsAsync(string email)
-    {
-        var document = await _detailViewCollection
-            .Find(x => x.Email == email)
-            .FirstOrDefaultAsync();
-        return document is not null;
     }
 
     public async Task SaveViewAsync(DetailView view)

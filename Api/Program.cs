@@ -29,61 +29,102 @@ public static class Bootstrapper
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Configuration.AddEnvironmentVariables();
-        builder.Services.AddOpenApi();
 
-        // Register clients
-        builder.Services.Configure<MongoDbClientOptions>(
-            builder.Configuration.GetSection(MongoDbClientOptions.SectionName)
-        );
-        builder.Services.AddSingleton<MongoDbClient>();
-        builder.Services.Configure<RabbitMqClientOptions>(
-            builder.Configuration.GetSection(RabbitMqClientOptions.SectionName)
-        );
-        builder.Services.AddSingleton<RabbitMqClient>();
+        AddPersistence(builder);
+        AddDomainEvents(builder);
+        AddIntegrationEvents(builder);
+        AddCommands(builder);
+        AddQueries(builder);
+        AddApplicationServices(builder);
+        AddAuthentication(builder);
+        AddControllers(builder);
 
-        // Register repository
-        builder.Services.Configure<MongoDbRepositoryOptions>(
-            builder.Configuration.GetSection(MongoDbRepositoryOptions.SectionName)
-        );
-        builder.Services.AddSingleton<IRepository, MongoDbRepository>();
+        return builder;
+    }
 
-        // Register storages
-        builder.Services.Configure<MongoDbAccountStorageOptions>(
-            builder.Configuration.GetSection(MongoDbAccountStorageOptions.SectionName)
-        );
-        builder.Services.AddSingleton<IAccountStorage, MongoDbAccountStorage>();
-        builder.Services.Configure<MongoDbEmailVerificationTokenStorageOptions>(
-            builder.Configuration.GetSection(MongoDbEmailVerificationTokenStorageOptions.SectionName)
-        );
-        builder.Services.AddSingleton<IEmailVerificationTokenStorage, MongoDbEmailVerificationTokenStorage>();
+    private static void AddPersistence(WebApplicationBuilder builder)
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddSingleton<IAccountRepository, InMemoryAccountRepository>();
+            builder.Services.AddSingleton<IAccountStorage, InMemoryAccountStorage>();
+            builder.Services.AddSingleton<IEmailVerificationTokenStorage, InMemoryEmailVerificationTokenStorage>();
+        }
+        else
+        {
+            builder.Services.Configure<MongoDbClientOptions>(
+                builder.Configuration.GetSection(MongoDbClientOptions.SectionName)
+            );
+            builder.Services.AddSingleton<MongoDbClient>();
 
-        // Register services
-        builder.Services.AddSingleton<IMessageSender, ConsoleMessageSender>();
+            builder.Services.Configure<MongoDbAccountRepositoryOptions>(
+                builder.Configuration.GetSection(MongoDbAccountRepositoryOptions.SectionName)
+            );
+            builder.Services.AddSingleton<IAccountRepository, MongoDbAccountRepository>();
 
-        // Register unit of work
-        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.Configure<MongoDbAccountStorageOptions>(
+                builder.Configuration.GetSection(MongoDbAccountStorageOptions.SectionName)
+            );
+            builder.Services.AddSingleton<IAccountStorage, MongoDbAccountStorage>();
+            builder.Services.Configure<MongoDbEmailVerificationTokenStorageOptions>(
+                builder.Configuration.GetSection(MongoDbEmailVerificationTokenStorageOptions.SectionName)
+            );
+            builder.Services.AddSingleton<IEmailVerificationTokenStorage, MongoDbEmailVerificationTokenStorage>();
+        }
+    }
 
-        // Register commands
-        RegisterCommandHandler<RegisterAccountCommand, RegisterAccountHandler, RegisterAccountResponse>(builder.Services);
-        RegisterCommandHandler<VerifyEmailCommand, VerifyEmailHandler, VerifyEmailResponse>(builder.Services);
-        builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-
-        // Register queries
-        RegisterQueryHandler<GetAccountDetailQuery, GetAccountDetailHandler, GetAccountDetailResponse>(builder.Services);
-        builder.Services.AddScoped<IQueryDispatcher, QueryDispatcher>();
-
-        // Register domain events
+    private static void AddDomainEvents(WebApplicationBuilder builder)
+    {
         RegisterEventHandler<AccountRegisteredEvent, AccountRegisteredEventHandler>(builder.Services);
         RegisterEventHandler<EmailVerifiedEvent, EmailVerifiedEventHandler>(builder.Services);
+
         builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
+    }
 
-        // Register integration events
-        builder.Services.Configure<RabbitMqIntegrationEventPublisherOptions>(
-            builder.Configuration.GetSection(RabbitMqIntegrationEventPublisherOptions.SectionName)
-        );
-        builder.Services.AddScoped<IIntegrationEventPublisher, RabbitMqIntegrationEventPublisher>();
+    private static void AddIntegrationEvents(WebApplicationBuilder builder)
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddSingleton<IIntegrationEventPublisher, InMemoryIntegrationEventPublisher>();
+        }
+        else
+        {
+            builder.Services.Configure<RabbitMqClientOptions>(
+                builder.Configuration.GetSection(RabbitMqClientOptions.SectionName)
+            );
+            builder.Services.AddSingleton<RabbitMqClient>();
 
-        // Register authentication/authorization
+            builder.Services.Configure<RabbitMqIntegrationEventPublisherOptions>(
+                builder.Configuration.GetSection(RabbitMqIntegrationEventPublisherOptions.SectionName)
+            );
+            builder.Services.AddScoped<IIntegrationEventPublisher, RabbitMqIntegrationEventPublisher>();
+        }
+    }
+
+    private static void AddCommands(WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        RegisterCommandHandler<RegisterAccountCommand, RegisterAccountHandler, RegisterAccountResponse>(builder.Services);
+        RegisterCommandHandler<VerifyEmailCommand, VerifyEmailHandler, VerifyEmailResponse>(builder.Services);
+
+        builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+    }
+
+    private static void AddQueries(WebApplicationBuilder builder)
+    {
+        RegisterQueryHandler<GetAccountDetailQuery, GetAccountDetailHandler, GetAccountDetailResponse>(builder.Services);
+
+        builder.Services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+    }
+
+    private static void AddApplicationServices(WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<IMessageSender, ConsoleMessageSender>();
+    }
+
+    private static void AddAuthentication(WebApplicationBuilder builder)
+    {
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<ICurrentUserProvider, HttpContextCurrentUserProvider>();
 
@@ -100,16 +141,17 @@ public static class Bootstrapper
             );
             authentication.AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>(JwtAuthenticationHandler.SchemeName, null);
         }
+
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("HasNickname", p => p.RequireClaim("nickname"));
         });
+    }
 
-        // Register endpoints
+    private static void AddControllers(WebApplicationBuilder builder)
+    {
         builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
-
-        return builder;
+        builder.Services.AddOpenApi();
     }
 
     private static void RegisterCommandHandler<TCommand, THandler, TResponse>(IServiceCollection services)

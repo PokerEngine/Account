@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 namespace Infrastructure.Test.Repository;
 
 [Trait("Category", "Integration")]
-public class MongoDbRepositoryTest(MongoDbClientFixture fixture) : IClassFixture<MongoDbClientFixture>
+public class MongoDbAccountRepositoryTest(MongoDbClientFixture fixture) : IClassFixture<MongoDbClientFixture>
 {
     [Fact]
     public async Task GetEventsAsync_WhenExists_ShouldReturn()
@@ -65,16 +65,16 @@ public class MongoDbRepositoryTest(MongoDbClientFixture fixture) : IClassFixture
         Assert.Equal("The account is not found", exc.Message);
     }
 
-    private IRepository CreateRepository()
+    private IAccountRepository CreateRepository()
     {
         var client = fixture.CreateClient();
         var options = CreateOptions();
-        return new MongoDbRepository(client, options);
+        return new MongoDbAccountRepository(client, options);
     }
 
-    private IOptions<MongoDbRepositoryOptions> CreateOptions()
+    private IOptions<MongoDbAccountRepositoryOptions> CreateOptions()
     {
-        var options = new MongoDbRepositoryOptions
+        var options = new MongoDbAccountRepositoryOptions
         {
             Database = $"test_repository_{Guid.NewGuid()}"
         };

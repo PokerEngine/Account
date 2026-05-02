@@ -63,7 +63,7 @@ public class GetAccountDetailTest
         string birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.AccountRepository, accountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -91,7 +91,7 @@ public class GetAccountDetailTest
 
     private StubUnitOfWork CreateUnitOfWork()
     {
-        var repository = new StubRepository();
+        var repository = new StubAccountRepository();
         var eventDispatcher = new StubEventDispatcher();
         return new StubUnitOfWork(repository, eventDispatcher);
     }

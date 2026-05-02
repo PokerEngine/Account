@@ -1,4 +1,4 @@
-@Api_HostAddress = http://0.0.0.0:5260
+@Api_HostAddress = http://0.0.0.0:5240
 @Alice = alice
 
 ### Register a new account

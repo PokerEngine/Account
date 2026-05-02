@@ -10,12 +10,12 @@ using MongoDB.Driver;
 
 namespace Infrastructure.Repository;
 
-public class MongoDbRepository : IRepository
+public class MongoDbAccountRepository : IAccountRepository
 {
     private const string CollectionName = "events";
     private readonly IMongoCollection<EventDocument> _collection;
 
-    public MongoDbRepository(MongoDbClient client, IOptions<MongoDbRepositoryOptions> options)
+    public MongoDbAccountRepository(MongoDbClient client, IOptions<MongoDbAccountRepositoryOptions> options)
     {
         var db = client.Client.GetDatabase(options.Value.Database);
         _collection = db.GetCollection<EventDocument>(CollectionName);
@@ -64,9 +64,9 @@ public class MongoDbRepository : IRepository
     }
 }
 
-public class MongoDbRepositoryOptions
+public class MongoDbAccountRepositoryOptions
 {
-    public const string SectionName = "MongoDbRepository";
+    public const string SectionName = "MongoDbAccountRepository";
 
     public required string Database { get; init; }
 }

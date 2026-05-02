@@ -2,7 +2,7 @@ using Domain.Event;
 
 namespace Application.Repository;
 
-public interface IRepository
+public interface IAccountRepository
 {
     Task<Guid> GetNextUidAsync();
     Task<List<IEvent>> GetEventsAsync(Guid uid);

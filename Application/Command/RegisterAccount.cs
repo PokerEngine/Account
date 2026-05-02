@@ -22,7 +22,7 @@ public record RegisterAccountResponse : ICommandResponse
 }
 
 public class RegisterAccountHandler(
-    IRepository repository,
+    IAccountRepository accountRepository,
     IAccountStorage accountStorage,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<RegisterAccountCommand, RegisterAccountResponse>
@@ -43,7 +43,7 @@ public class RegisterAccountHandler(
         }
 
         var account = Account.FromScratch(
-            uid: await repository.GetNextUidAsync(),
+            uid: await accountRepository.GetNextUidAsync(),
             nickname: command.Nickname,
             email: command.Email,
             firstName: command.FirstName,

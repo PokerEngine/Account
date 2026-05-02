@@ -13,7 +13,7 @@ public record VerifyEmailCommand : ICommand
 public record VerifyEmailResponse : ICommandResponse;
 
 public class VerifyEmailHandler(
-    IRepository repository,
+    IAccountRepository accountRepository,
     IEmailVerificationTokenStorage emailVerificationTokenStorage,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<VerifyEmailCommand, VerifyEmailResponse>
@@ -22,7 +22,7 @@ public class VerifyEmailHandler(
     {
         var accountUid = await emailVerificationTokenStorage.VerifyTokenAsync(command.VerificationToken);
 
-        var account = Account.FromEvents(accountUid, await repository.GetEventsAsync(accountUid));
+        var account = Account.FromEvents(accountUid, await accountRepository.GetEventsAsync(accountUid));
 
         account.VerifyEmail();
 

@@ -6,7 +6,7 @@ using Domain.Event;
 namespace Application.UnitOfWork;
 
 public class UnitOfWork(
-    IRepository repository,
+    IAccountRepository accountRepository,
     IEventDispatcher eventDispatcher
 ) : IUnitOfWork
 {
@@ -15,7 +15,7 @@ public class UnitOfWork(
     public void Register(Account account) =>
         _commits.Add(() => CommitAsync(
             account,
-            events => repository.AddEventsAsync(account.Uid, events)
+            events => accountRepository.AddEventsAsync(account.Uid, events)
         ));
 
     public async Task CommitAsync()

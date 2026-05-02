@@ -2,9 +2,9 @@ using Application.Exception;
 using Application.Storage;
 using System.Collections.Concurrent;
 
-namespace Application.Test.Storage;
+namespace Infrastructure.Storage;
 
-public class StubAccountStorage : IAccountStorage
+public class InMemoryAccountStorage : IAccountStorage
 {
     private readonly ConcurrentDictionary<Guid, DetailView> _detailMapping = new();
 

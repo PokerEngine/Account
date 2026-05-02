@@ -27,13 +27,13 @@ public class RegisterAccountTest
             LastName = "Alright",
             BirthDate = "2000-01-01"
         };
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.AccountRepository, accountStorage, unitOfWork);
 
         // Act
         var response = await handler.HandleAsync(command);
 
         // Assert
-        var account = Account.FromEvents(response.Uid, await unitOfWork.Repository.GetEventsAsync(response.Uid));
+        var account = Account.FromEvents(response.Uid, await unitOfWork.AccountRepository.GetEventsAsync(response.Uid));
         Assert.Equal(new AccountUid(response.Uid), account.Uid);
         Assert.Equal(new Nickname("Alice"), account.Nickname);
         Assert.Equal(new Email("alice.alright@test.com"), account.Email);
@@ -62,7 +62,7 @@ public class RegisterAccountTest
             LastName = "Alright",
             BirthDate = "2000-01-01"
         };
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.AccountRepository, accountStorage, unitOfWork);
 
         // Act
         var exc = await Assert.ThrowsAsync<NotUniqueNicknameException>(async () =>
@@ -90,7 +90,7 @@ public class RegisterAccountTest
             LastName = "Alright",
             BirthDate = "2000-01-01"
         };
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.AccountRepository, accountStorage, unitOfWork);
 
         // Act
         var exc = await Assert.ThrowsAsync<NotUniqueEmailException>(async () =>
@@ -112,7 +112,7 @@ public class RegisterAccountTest
         string birthDate
     )
     {
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.AccountRepository, accountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -140,7 +140,7 @@ public class RegisterAccountTest
 
     private StubUnitOfWork CreateUnitOfWork()
     {
-        var repository = new StubRepository();
+        var repository = new StubAccountRepository();
         var eventDispatcher = new StubEventDispatcher();
         return new StubUnitOfWork(repository, eventDispatcher);
     }

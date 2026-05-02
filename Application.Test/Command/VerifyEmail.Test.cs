@@ -24,13 +24,13 @@ public class VerifyEmailTest
         {
             VerificationToken = verificationToken
         };
-        var handler = new VerifyEmailHandler(unitOfWork.Repository, emailVerificationTokenStorage, unitOfWork);
+        var handler = new VerifyEmailHandler(unitOfWork.AccountRepository, emailVerificationTokenStorage, unitOfWork);
 
         // Act
         await handler.HandleAsync(command);
 
         // Assert
-        var account = Account.FromEvents(accountUid, await unitOfWork.Repository.GetEventsAsync(accountUid));
+        var account = Account.FromEvents(accountUid, await unitOfWork.AccountRepository.GetEventsAsync(accountUid));
         Assert.True(account.IsEmailVerified);
 
         var events = unitOfWork.EventDispatcher.GetDispatchedEvents();
@@ -50,7 +50,7 @@ public class VerifyEmailTest
         {
             VerificationToken = "unknown-token"
         };
-        var handler = new VerifyEmailHandler(unitOfWork.Repository, emailVerificationTokenStorage, unitOfWork);
+        var handler = new VerifyEmailHandler(unitOfWork.AccountRepository, emailVerificationTokenStorage, unitOfWork);
 
         // Act
         var exc = await Assert.ThrowsAsync<WrongEmailVerificationTokenException>(async () =>
@@ -75,7 +75,7 @@ public class VerifyEmailTest
         {
             VerificationToken = verificationToken
         };
-        var handler = new VerifyEmailHandler(unitOfWork.Repository, emailVerificationTokenStorage, unitOfWork);
+        var handler = new VerifyEmailHandler(unitOfWork.AccountRepository, emailVerificationTokenStorage, unitOfWork);
 
         // Act
         var exc = await Assert.ThrowsAsync<WrongEmailVerificationTokenException>(async () =>
@@ -97,7 +97,7 @@ public class VerifyEmailTest
     )
     {
         var accountStorage = new StubAccountStorage();
-        var handler = new RegisterAccountHandler(unitOfWork.Repository, accountStorage, unitOfWork);
+        var handler = new RegisterAccountHandler(unitOfWork.AccountRepository, accountStorage, unitOfWork);
         var command = new RegisterAccountCommand
         {
             Nickname = nickname,
@@ -113,7 +113,7 @@ public class VerifyEmailTest
 
     private StubUnitOfWork CreateUnitOfWork()
     {
-        var repository = new StubRepository();
+        var repository = new StubAccountRepository();
         var eventDispatcher = new StubEventDispatcher();
         return new StubUnitOfWork(repository, eventDispatcher);
     }
