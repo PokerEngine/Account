@@ -1,3 +1,5 @@
+using Api.Authentication;
+using Application.Authentication;
 using Application.Command;
 using Application.Event;
 using Application.IntegrationEvent;
@@ -16,6 +18,7 @@ using Infrastructure.Query;
 using Infrastructure.Repository;
 using Infrastructure.Service.MessageSender;
 using Infrastructure.Storage;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Api;
 
@@ -80,6 +83,29 @@ public static class Bootstrapper
         );
         builder.Services.AddScoped<IIntegrationEventPublisher, RabbitMqIntegrationEventPublisher>();
 
+        // Register authentication/authorization
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICurrentUserProvider, HttpContextCurrentUserProvider>();
+
+        if (builder.Environment.IsDevelopment())
+        {
+            var authentication = builder.Services.AddAuthentication(DevelopmentAuthenticationHandler.SchemeName);
+            authentication.AddScheme<AuthenticationSchemeOptions, DevelopmentAuthenticationHandler>(DevelopmentAuthenticationHandler.SchemeName, null);
+        }
+        else
+        {
+            var authentication = builder.Services.AddAuthentication(JwtAuthenticationHandler.SchemeName);
+            builder.Services.Configure<JwtAuthenticationOptions>(
+                builder.Configuration.GetSection(JwtAuthenticationOptions.SectionName)
+            );
+            authentication.AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>(JwtAuthenticationHandler.SchemeName, null);
+        }
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("HasNickname", p => p.RequireClaim("nickname"));
+        });
+
+        // Register endpoints
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
 
@@ -135,6 +161,9 @@ public class Program
         {
             app.UseHttpsRedirection();
         }
+
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.MapOpenApi();
         app.MapControllers();

@@ -6,5 +6,8 @@ public abstract class InternalSystemException(string message, System.Exception? 
 public class InternalSystemMisconfiguredException(string message, System.Exception? innerException = null)
     : InternalSystemException(message, innerException);
 
+public class WrongAuthTokenException(string message, System.Exception? innerException = null)
+    : InternalSystemException(message, innerException);
+
 public class WrongEmailVerificationTokenException(string message, System.Exception? innerException = null)
     : InternalSystemException(message, innerException);
